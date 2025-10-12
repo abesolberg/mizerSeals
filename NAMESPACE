@@ -6,8 +6,11 @@ export('getSealN') # Function to map through matrix of seal abundance
 export('getSealMortSim') # Function to get mortality over time
 export('plotSealPredKernel') # Function to easily plot pred kernel
 export('getSealDietSim') # Export Seal Diet
-export('list2array')
-export('getSealRepro')
+export('list2array') # Helper Function
+export('getSealRepro') # Seal Reproduction Function
+export('getTrawlCatch')
+export('getTrawlCatchSize')
+export('plotSealMort')
 
 import('mizer') # Import all mizer functions
 importFrom('stats' , 'setNames')

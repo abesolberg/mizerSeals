@@ -13,20 +13,18 @@ getSealMort <- function(params, n = params@initial_n,
     dw_seal = sp$dw ,
     ft_pred_kernel_e = sp$ft_pred_kernel_e ,
     n = n,
-    sp$interaction_seal ,
+    n_pp = n_pp , 
+    seal_interaction = sp$interaction_seal ,
+    seal_resource_interaction = sp$resource_interaction_seal ,
     f0 = sp$f0  ,
     h = sp$h  ,
     q = sp$q
   )
 
-  #cat(max(n_other$seals[1,]), '\n')
-  #n_seal <- n_other$seals
-
   feedingLevel <- getSealFeedingLevel(w_seal = sp$w , seal_encounter = encounterSearchVol$encounter , h = sp$h , n = sp$n)
   sealRates <- getSealPredRate(
     params = params ,
     n_seal = n_other$seals ,
-    #n_seal = getSealN(params , t) ,
     w_seal = sp$w ,
     dw_seal = sp$dw ,
     ft_pred_kernel_p = sp$ft_pred_kernel_p  ,

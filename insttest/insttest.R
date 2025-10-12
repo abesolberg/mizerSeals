@@ -15,15 +15,35 @@ sealParams <- setSealParams(
   beta = 1000 , sigma = 3 ,
   time_step = 1 , dynamicSeals = F
 )
-sealParams$initialSealN[,107] <- rnorm(1 , 20000000 , 250000)/sealParams$dw[107]
+sealParams$initialSealN[,107] <- rnorm(1 , 20000000 , 0)/sealParams$dw[107]
 #sealParams$initialSealN[,107] <- 1:100
 params <- setSeals(params , sealParams)
 sim <- project(params , t_max = 5)
-sim2 <- project(params, t_max= 5 , t_save = 0.1)
 
-dim(sim2@n_other)
+diet <- getSealDiet(params)
+mort <- getSealMort(params)
 
-dim(sim@n_other)
+## Test
+sapply(list.files('R/',full.names=T) , source)
+
+sealParams <- setSealParams(
+  params , w_max_seal = 150000 , w_min_seal = 11000 ,
+  interaction_seal = rep(1 , length(params@species_params$species)) ,
+  beta = 1000 , sigma = 3 , resource_interaction_seal = 0 , 
+  time_step = 1 , dynamicSeals = F
+)
+sealParams$initialSealN[,107] <- rnorm(1 , 20000000 , 0)/sealParams$dw[107]
+#sealParams$initialSealN[,107] <- 1:100
+params <- setSeals(params , sealParams)
+sim <- project(params , t_max = 5)
+
+diet_res0 <- getSealDiet(params)
+mort_res0 <- getSealMort(params)
+
+diet_res0$total_consumption == diet$total_consumption
+all(diet$diet == diet_res0$diet[1:12,])
+
+plot(sim , return_data = F , only_mature = F)
 
 sapply(1:6 , function(x)sim@n_other[x,][[1]][,107])
 

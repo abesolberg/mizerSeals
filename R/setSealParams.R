@@ -4,6 +4,7 @@ setSealParams <- function(
     w_max_seal ,
     w_min_seal ,
     interaction_seal,
+    resource_interaction_seal,
     a = .35, q = .8, n = .75,
     beta = 50, sigma = 3, f0 = 0.6, h = 30 ,
     time_steps = 1 ,
@@ -28,6 +29,7 @@ setSealParams <- function(
       dw = (10^dx - 1) * w ,
       initialSealN = array(0 , dim = c(time_steps , length(w))) ,
       interaction_seal = interaction_seal,
+      resource_interaction_seal = resource_interaction_seal , 
       a = a,
       q = q ,
       n= n ,
@@ -35,7 +37,8 @@ setSealParams <- function(
       sigma = sigma,
       f0 = f0 ,
       h = h,
-      dynamicSeals = dynamicSeals
+      dynamicSeals = dynamicSeals ,
+      ...
     )
   )
 }

@@ -3,12 +3,14 @@
 # https://sizespectrum.org/mizer/reference/get_h_default.html
 # https://sizespectrum.org/mizer/reference/get_f0_default.html
 # https://sizespectrum.org/mizer/reference/setSearchVolume.html?q=sear#null
-getSealEncounterSearchVol <- function(params , w_seal , dw_seal , ft_pred_kernel_e , n , seal_interaction , f0 = .6 , h = 30 , q = .8) {
-  prey <- outer(params@species_params$interaction_resource, 
-                params@initial_n_pp)
+getSealEncounterSearchVol <- function(params , w_seal , dw_seal , ft_pred_kernel_e , n , n_pp , seal_interaction , seal_resource_interaction , f0 = .6 , h = 30 , q = .8) {
+  
+  n_all <- matrix(NA , nrow = nrow(n)+1 , ncol = ncol(n))
+  n_all[1:nrow(n),] <- n
+  n_all[nrow(n_all),] <- n_pp[params@w_full %in% params@w]
   
   prey <- array(0 , dim = c(1 , length(w_seal)))
-  prey[1:length(params@w)] <- seal_interaction %*% n
+  prey[1:length(params@w)] <- c(seal_interaction , seal_resource_interaction) %*% n_all
   
   prey <- sweep(prey, 2, w_seal * dw_seal, "*")
   avail_energy <- Re(base::t(mvfft(base::t(ft_pred_kernel_e) * mvfft(base::t(prey)), inverse = TRUE)))/length(w_seal)
