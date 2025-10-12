@@ -1,0 +1,13 @@
+export('setSealParams') # Function to set initial paramaters for seals
+export('setSeals') # Function to add seals as object in mizer
+export('getSealMort') # Function to bring in seal mortality to projection
+export('getSealDiet') # Function to get seal diet from projection
+export('getSealN') # Function to map through matrix of seal abundance
+export('getSealMortSim') # Function to get mortality over time
+export('plotSealPredKernel') # Function to easily plot pred kernel
+export('getSealDietSim') # Export Seal Diet
+export('list2array')
+export('getSealRepro')
+
+import('mizer') # Import all mizer functions
+importFrom('stats' , 'setNames')

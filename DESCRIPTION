@@ -1,0 +1,25 @@
+Package: mizerSeals
+Type: Package
+Title: Extention to bring seal dynamics into Mizer
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Abe", "Solberg",
+      email = "abe.solberg@mi.mun.ca",
+      role = c("aut", "cre")
+    ) ,
+    person(
+      "Pablo", "Vajas",
+      email = "Pablo.Vajas@mi.mun.ca",
+      role = c("aut")
+    )
+  )
+Description: Package extention for mizer.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.1)
+Imports:
+    mizer (>= 2.5)
+
