@@ -10,3 +10,5 @@ inst/doc
 /*_*.tar.gz
 /output
 /scratch
+*.dll
+*.o

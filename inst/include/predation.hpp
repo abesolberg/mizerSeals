@@ -1,4 +1,15 @@
 //// functions involving FFT
+// Global storage for dimensions
+static int g_nRows = 0;  // Default value
+static int g_nCols = 0;  // Default value
+
+// Function to set nRows and nCols before calling the atomic function
+void set_fft_dims(int nR, int nC) {
+  g_nRows = nR;
+  g_nCols = nC;
+}
+
+
 template <typename T>
 inline double get_base(const T &x) {
   return x;
@@ -214,7 +225,9 @@ matrix<Type> computePrey(vector<Type> species_params_interaction_resource,
 }
 
 extern "C" SEXP call_computePrey(SEXP species_params_interaction_resource, SEXP n_pp , SEXP n , SEXP species_params_interaction , SEXP w_full , SEXP w , SEXP dw_full){
-  matrix <double > y = computePrey (asVector<double>(species_params_interaction_resource),asVector <double>(n_pp) , asMatrix<double>(n),asMatrix<double>(species_params_interaction),asVector<double>(w_full),asVector<double>(dw_full) );
+  matrix <double > y = computePrey(asVector<double>(species_params_interaction_resource),asVector <double>(n_pp) , 
+                                    asMatrix<double>(n),asMatrix<double>(species_params_interaction),asVector<double>(w_full), asVector<double>(w),
+                                    asVector<double>(dw_full) );
   return asSEXP (y);
 }
 
@@ -356,8 +369,19 @@ matrix<Type> getEncounter(
   return ret;
 }
 
-extern "C" SEXP call_getEncounter(SEXP n, SEXP w_full , SEXP w , SEXP feeding_level , SEXP search_vol , SEXP dw){
-  matrix <double > y = getEncounter (asMatrix<double>(n),asVector <double>(w_full),asVector<double>(w),asMatrix<double>(feeding_level),asMatrix<double>(search_vol),asVector<double>(dw),asMatrix<double>(ft_pred_kernel_p_real),asMatrix<double>(ft_pred_kernel_p_imag),asMatrix<double>(search_vol) );
+extern "C" SEXP call_getEncounter(SEXP species_params_interaction_resource , SEXP n_pp , SEXP n , SEXP species_params_interaction , SEXP w_full , SEXP w ,
+                                 SEXP dw_full , SEXP ft_pred_kernel_p_real , SEXP ft_pred_kernel_p_imag , SEXP search_vol){
+  matrix <double > y = getEncounter (
+    asVector<double>(species_params_interaction_resource) ,
+    asVector<double>(n_pp) ,
+    asMatrix<double>(n),
+    asMatrix<double>(species_params_interaction),
+    asVector <double>(w_full),
+    asVector<double>(w),
+    asVector<double>(dw_full),
+    asMatrix<double>(ft_pred_kernel_p_real),
+    asMatrix<double>(ft_pred_kernel_p_imag),
+    asMatrix<double>(search_vol));
   return asSEXP (y);
 }
 
@@ -373,20 +397,35 @@ matrix <Type> getFeedingLevel(matrix<Type> intake_max, matrix<Type> encounter){
   return ret;
 }
 
+extern "C" SEXP call_getFeedingLevel(SEXP intake_max , SEXP encounter){
+  matrix <double > y = getFeedingLevel (asMatrix<double>(intake_max) , asMatrix<double>(encounter));
+  return asSEXP (y);
+}
+
 // =========================== getPredMort ===============================
 template<class Type>
-matrix <Type> PredMort(vector<Type> w_full, vector<Type> w, matrix<Type> interaction, matrix<Type> pred_rate){
+matrix <Type> getPredMort(vector<Type> w_full, vector<Type> w, matrix<Type> interaction, matrix<Type> pred_rate){
   matrix<Type> ret(pred_rate.rows(),w.size()) ;
   matrix <Type> tmp= pred_rate.block(0,w_full.size()-w.size(),pred_rate.rows(),w.size());
   ret = interaction.transpose() * tmp; // ask Gustav about drop==FALSE
   return ret;
 }
 
+extern "C" SEXP call_getPredMort(SEXP w_full , SEXP w , SEXP interaction , SEXP pred_rate){
+  matrix <double > y = getPredMort (asVector<double>(w_full) , asVector<double>(w) , asMatrix<double>(interaction) , asMatrix<double>(pred_rate));
+  return asSEXP (y);
+}
+
 // =========================== getResourceMort ===============================
 template<class Type>
-vector <Type> ResourceMort(vector<Type> species_params_interaction_resource, matrix<Type> pred_rate){
+vector <Type> getResourceMort(vector<Type> species_params_interaction_resource, matrix<Type> pred_rate){
   vector<Type> ret(pred_rate.cols()) ;
   matrix<Type> tmp = pred_rate.transpose();
   ret = tmp * species_params_interaction_resource;
   return ret;
+}
+
+extern "C" SEXP call_getResourceMort(SEXP species_params_interaction_resource , SEXP pred_rate){
+  matrix <double > y = getResourceMort (asVector<double>(species_params_interaction_resource) , asMatrix<double>(pred_rate));
+  return asSEXP (y);
 }
