@@ -10,7 +10,7 @@ getSealMortSim <- function(sim){
   idx <- seq(1 , dim(sim@n)[1])
   ret <- sim@n
   ret[] <- 0
-  for(i in idx) ret[i,,] <- getSealMort(params = sim@params , n = sim@n[i,,] , n_pp = sim@n_pp[i,],setNames(sim@n_other[i,] , 'seals') , t = i)
+  for(i in idx) ret[i,,] <- getSealMort(params = sim@params , n = sim@n[i,,] , n_pp = sim@n_pp[i,], n_other = setNames(sim@n_other[i,] , 'seals') , t = i)
   return(ret)
 }
 
@@ -19,7 +19,7 @@ getSealDietSim <- function(sim , type = c('diet' , 'total_consumption' , 'diet_b
   type <- match.arg(type , several.ok = F)
   if(!inherits(sim , 'MizerSim')) stop('Not a simulation.')
   idx <- seq(1 , dim(sim@n)[1])
-  ret <- sapply(idx , function(i) getSealDiet(params = sim@params , n = sim@n[i,,] , n_pp = sim@n_pp[i,] , n_seal = sim@n_other[i,][[1]] , idx_sp = 1:length(params@w) , t = i)[[type]] , simplify = F)
+  ret <- sapply(idx , function(i) getSealDiet(params = sim@params , n = sim@n[i,,] , n_pp = sim@n_pp[i,] , n_other = setNames(sim@n_other[i,] , 'seals') , idx_sp = 1:length(params@w) , t = i)[[type]] , simplify = F)
   return(ret)
 }
 

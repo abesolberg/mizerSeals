@@ -1,39 +1,42 @@
 ## Get Seal Mortality -- Exported
+
 getSealMort <- function(params, n = params@initial_n,
                         n_pp = params@initial_n_pp,
                         n_other = params@initial_n_other,
                         t , ...) {
-
   if(is.null(params@other_params$sealParams)) stop('Must add seal parameters to other params.')
   sp <- params@other_params$sealParams
 
-  encounterSearchVol <- getSealEncounterSearchVol(
-    params ,
-    w_seal = sp$w ,
-    dw_seal = sp$dw ,
-    ft_pred_kernel_e = sp$ft_pred_kernel_e ,
-    n = n,
-    n_pp = n_pp , 
-    seal_interaction = sp$interaction_seal ,
-    seal_resource_interaction = sp$resource_interaction_seal ,
-    f0 = sp$f0  ,
-    h = sp$h  ,
-    q = sp$q
-  )
+  search_vol <- getSealSearchVol(params , n , n_pp)
+  encounter <- getSealEncounter(params , search_volume = search_vol)
+  feedingLevel <- getSealFeedingLevel(params , encounter)
+  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = search_vol )
 
-  feedingLevel <- getSealFeedingLevel(w_seal = sp$w , seal_encounter = encounterSearchVol$encounter , h = sp$h , n = sp$n)
-  sealRates <- getSealPredRate(
-    params = params ,
-    n_seal = n_other$seals ,
-    w_seal = sp$w ,
-    dw_seal = sp$dw ,
-    ft_pred_kernel_p = sp$ft_pred_kernel_p  ,
-    seal_interaction = sp$interaction_seal ,
-    feeding_level = feedingLevel ,
-    search_vol = encounterSearchVol$search_vol
-  )
+  mu_seal <- getSealMortRate(params , pred_rate)
+  return(mu_seal)
+}
 
-  mu_s <- sealRates$pred_mort
-  return(mu_s)
+getSealResourceMort <- function(params, n = params@initial_n,
+                                n_pp = params@initial_n_pp,
+                                n_other = params@initial_n_other,
+                                t ,...) {
+  if(is.null(params@other_params$sealParams)) stop('Must add seal parameters to other params.')
+  sp <- params@other_params$sealParams
+
+  search_vol <- getSealSearchVol(params , n , n_pp)
+  encounter <- getSealEncounter(params , search_volume = search_vol)
+  feedingLevel <- getSealFeedingLevel(params , encounter)
+  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = search_vol )
+
+  mu_seal <- getSealResourceMortRate(params , pred_rate)
+
+  f <- function (params, n, n_pp, n_other, t, pred_rate, ...) {
+    as.vector(params@species_params$interaction_resource %*% pred_rate)
+  }
+  mort <- f(params, n = n, n_pp = n_pp, n_other = n_other, t = t, pred_rate = mizer::getPredRate(params, n = n, n_pp = n_pp, n_other = n_other, t = t))
+  names(mort) <- names(params@initial_n_pp)
+  idx <- tail(1:length(mort) , length(params@w))
+  mort[idx] <- mort[idx] + c(mu_seal)
+  return(mort)
 }
 

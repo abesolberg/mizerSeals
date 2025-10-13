@@ -1,6 +1,8 @@
 # Outputs seal feeding level
 # https://sizespectrum.org/mizer/reference/setMaxIntakeRate.html?q=intake#null
-getSealFeedingLevel <- function(w_seal , seal_encounter , h = 30 , n = .7) {
-  intake_max <- h*w_seal^n
-  return(seal_encounter/(seal_encounter + intake_max))
+
+getSealFeedingLevel <- function(params , encounter) {
+  sp <- params@other_params$sealParams
+  intake_max <- sp$h*sp$w^sp$n
+  return(encounter/(encounter + intake_max))
 }

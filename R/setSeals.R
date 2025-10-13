@@ -6,5 +6,6 @@ setSeals <- function(params, sealParams) {
   params@initial_n_other[["seals"]] <- sealParams$initialSealN[1,,drop=F]
   params@other_dynamics[["seals"]] <- "getSealRepro"
   params@other_mort[["seals"]] <- "getSealMort"
+  params <- setRateFunction(params, "ResourceMort", "getSealResourceMort")
   return(params)
 }
