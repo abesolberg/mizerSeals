@@ -4,10 +4,10 @@ getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_
   seal_params <- params@other_params$sealParams
   n_seal <- n_other$seals
 
-  search_vol <- getSealSearchVol(params , n , n_pp)
-  encounter <- getSealEncounter(params , search_volume = search_vol)
+  #search_vol <- getSealSearchVol(params , n , n_pp)
+  encounter <- getSealEncounter(params , search_vol = sp$search_vol)
   feedingLevel <- getSealFeedingLevel(params , encounter)
-  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = search_vol )
+  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = sp$search_vol )
 
   seal_interaction <- c(seal_params$interaction_seal , seal_params$resource_interaction_seal)
 
@@ -35,7 +35,7 @@ getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_
   diet <- t(ae[1,,,drop = T])
 
   for(i in 1:nrow(diet)) {
-    diet[i,] = diet[i,]*search_vol*seal_interaction[i]
+    diet[i,] = diet[i,]*sp$search_vol*seal_interaction[i]
   }
   diet <- diet * matrix(data = (1 - feedingLevel[1,]) , nrow = no_sp , ncol = no_w_full , byrow = T)
   diet[,n_seal <= 0] <- 0

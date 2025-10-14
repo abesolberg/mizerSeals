@@ -7,10 +7,9 @@ getSealMort <- function(params, n = params@initial_n,
   if(is.null(params@other_params$sealParams)) stop('Must add seal parameters to other params.')
   sp <- params@other_params$sealParams
 
-  search_vol <- getSealSearchVol(params , n , n_pp)
-  encounter <- getSealEncounter(params , search_volume = search_vol)
+  encounter <- getSealEncounter(params , search_vol = sp$search_vol)
   feedingLevel <- getSealFeedingLevel(params , encounter)
-  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = search_vol )
+  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = sp$search_vol )
 
   mu_seal <- getSealMortRate(params , pred_rate)
   return(mu_seal)
@@ -23,10 +22,9 @@ getSealResourceMort <- function(params, n = params@initial_n,
   if(is.null(params@other_params$sealParams)) stop('Must add seal parameters to other params.')
   sp <- params@other_params$sealParams
 
-  search_vol <- getSealSearchVol(params , n , n_pp)
-  encounter <- getSealEncounter(params , search_volume = search_vol)
+  encounter <- getSealEncounter(params , search_vol = sp$search_vol)
   feedingLevel <- getSealFeedingLevel(params , encounter)
-  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = search_vol )
+  pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = sp$search_vol )
 
   mu_seal <- getSealResourceMortRate(params , pred_rate)
 

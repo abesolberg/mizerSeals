@@ -5,7 +5,7 @@ library(ggplot2)
 # https://publications.gc.ca/collections/collection_2020/mpo-dfo/fs70-5/Fs70-5-2020-014-eng.pdf
 # https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2021.579946/full
 
-# sapply(list.files('R/',full.names=T) , source)
+sapply(list.files('R/', , full.names=T)[!grepl('TMB' , list.files('R/'))] , source)
 
 params <- mizer::NS_params
 
@@ -13,22 +13,27 @@ sealParams <- setSealParams(
   mizer::NS_params , w_max_seal = 150000 , w_min_seal = 11000 ,
   interaction_seal = rep(1 , length(params@species_params$species)) ,
   beta = 5000 , sigma = 3 , resource_interaction_seal = 100 ,
-  time_step = 1 , dynamicSeals = F
+  time_step = 1 , dynamicSeals = F , h = 250
 )
 sealParams$initialSealN[,107] <- rnorm(1 , 20000000 , 0)/sealParams$dw[107]
 #sealParams$initialSealN[,107] <- 1:100
 params <- setSeals(mizer::NS_params , sealParams)
-sim <- project(params , t_max = 100)
+sim <- project(params , t_max = 10)
 
 plot(sim)
 
 diet <- getSealDiet(params)
 diet$diet_by_sp
-diet$percent_by_sp
+diet$percent_by_sp ; sum(diet$percent_by_sp)
 mort <- getSealMort(params)
 resource_mort <- getSealResourceMort(params)
 
 plot(resource_mort)
+plot(mort[2,])
+
+plotSealMort(params , return_data = F)
+
+  max(mort)
 
 sealParams2 <- setSealParams(
   mizer::NS_params , w_max_seal = 150000 , w_min_seal = 11000 ,
