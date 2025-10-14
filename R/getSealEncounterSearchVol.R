@@ -3,6 +3,29 @@
 # https://sizespectrum.org/mizer/reference/get_h_default.html
 # https://sizespectrum.org/mizer/reference/get_f0_default.html
 # https://sizespectrum.org/mizer/reference/setSearchVolume.html?q=sear#null
+getSealGamma <- function(params) {
+  params@other_params$sealParams$gamma <- 1
+  # params <- setSearchVolume(params)
+  sweep(outer(params@species_params[["q"]], params@w,
+              function(x, y) y^x), 1, params@species_params$gamma,
+        "*")
+
+  # and setting a power-law prey spectrum
+  params@initial_n[] <- 0
+  if (defaults_edition() < 2) {
+    # See issue #238
+    params@species_params$interaction_resource <- 1
+  }
+  params@initial_n_pp[] <- params@resource_params$kappa *
+    params@w_full^(-params@resource_params$lambda)
+  avail_energy <- getEncounter(params)[, length(params@w)] /
+    params@w[length(params@w)] ^
+    (2 + params@species_params[["q"]] - params@resource_params$lambda)
+  # Now set gamma so that this available energy leads to f0
+  gamma_default <- (species_params[["h"]] / avail_energy) *
+    (species_params$f0 / (1 - species_params$f0))
+}
+
 getSealSearchVol <- function(params , n = params@initial_n, n_pp = params@initial_n_pp , ...) {
 
   sp <- params@other_params$sealParams
