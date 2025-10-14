@@ -2,6 +2,7 @@
 #include <fftw3.h>
 #include <unsupported/Eigen/FFT>
 #include "../inst/include/predation.hpp"
+#include "../inst/include/helpers.hpp"
 
 using namespace atomic;
 

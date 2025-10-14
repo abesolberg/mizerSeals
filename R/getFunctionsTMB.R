@@ -19,9 +19,24 @@ tmb_computeQMatrix <- function(params , feeding_level , search_vol = params@sear
   .Call("call_computeQMatrix" , n, w_full , w , feeding_level , search_vol , dw)
 }
 
+# Pred Rate
 tmb_getPredRate <- function(params , feeding_level , n = params@initial_n , search_vol = params@search_vol , dw = params@dw , ft_pred_kernel_p_real = NULL ,
                             ft_pred_kernel_p_imag = NULL , ft_mask = params@ft_mask) {
   .Call("call_getPredRate", n , w_full , w , feeding_level , search_vol , dw , ft_pred_kernel_p_real , ft_pred_kernel_p_imag , ft_mask)
+}
+
+tmb_convertNppUp <- function(npp , w , w_new) {
+  .Call("call_convertDimsUpNpp" , npp , w , w_new)
+}
+tmb_convertNppDown <- function(npp , w , npp_convert) {
+  .Call("call_convertDimsDownNpp" , npp , w , npp_convert)
+}
+
+tmb_convertNUp <- function(n , w_new) {
+  .Call("call_convertDimsUpN" , n , w_new)
+}
+tmb_convertNDown <- function(n , n_convert) {
+  .Call("call_convertDimsDownN" , n , n_convert)
 }
 
 
@@ -41,6 +56,11 @@ sealParams <- setSealParams(
 sealParams$initialSealN[,107] <- rnorm(1 , 20000000 , 0)/sealParams$dw[107]
 params <- setSeals(mizer::NS_params , sealParams)
 
+ft_pred_kernel_real <- Re(params@ft_pred_kernel_e)
+ft_pred_kernel_imag <- Im(params@ft_pred_kernel_e)
+ft_pred_kernel_p_imag <- Im(params@ft_pred_kernel_p)
+ft_pred_kernel_p_real <- Re(params@ft_pred_kernel_p)
+
 fl <- tmb_getFeedingLevel(NS_params@intake_max , getEncounter(params))
 pr <- tmb_computePrey(params)
 Q <- tmb_computeQMatrix(params , feeding_level = fl)
@@ -56,12 +76,11 @@ n_pp <- c(tail(params@initial_n_pp , 100) , rep(0 , 7))
 
 x <- getSealPredRate(params)
 
-tmb_computePrey()
-
+# This works for seals
 tmb_computePrey(
   params ,
-  n =  as.matrix(cbind(params@initial_n , matrix(0 , nrow = nrow(params@initial_n) , ncol = 7))) , 
-  n_pp = c(tail(params@initial_n_pp , 100) , rep(0 , 7)) , 
+  n =  tmb_convertNUp(params@initial_n , params@other_params$sealParams$w) , 
+  n_pp = tmb_convertNppUp(params@initial_n_pp , params@w , params@other_params$sealParams$w) , 
   interaction_resource = params@other_params$sealParams$resource_interaction_seal ,
   interaction = matrix(params@other_params$sealParams$interaction_seal , nrow = 1) ,
   w_full = params@other_params$sealParams$w ,
@@ -69,30 +88,3 @@ tmb_computePrey(
   w = params@other_params$sealParams$w
 )
 
-sp <- params@other_params$sealParams
-list2env(sp , globalenv())
-n <- params@initial_n ; n_pp <- params@initial_n_pp
-
-
-computePrey(resource_interaction_seal,
-            n_pp,
-            n,
-            interaction_seal,
-            w_full,
-            w,
-            dw_full) {
-  ret <- matrix(NA , nrow = length(resource_interaction_seal) , ncol = length(n_pp))
-  matrix<Type> ret(species_params_interaction_resource.size(), n_pp.size());
-  for(i in 1:nrow(ret)){
-    for(j in 1:ncol(ret)){
-      ret[i,j] = resource_interaction_seal[i] * n_pp[j]
-    }
-  }
-  
-  ret.block(0, w_full.size() - w.size(), ret.rows(), w.size()) += species_params_interaction * n;
-  vector<Type> tmp = w_full * dw_full;
-  for (int i = 0; i < ret.rows(); ++i) {
-    ret.row(i) = vector<Type>(ret.row(i)) * tmp;
-  }
-  return ret;
-}
