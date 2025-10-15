@@ -37,8 +37,7 @@ plotSealMort <- function(object , return_data = T , only_mature = T , include = 
   if(return_data) return(df)
   } else if (is(object, "MizerParams")) {
     params <- object
-    params <- object
-    
+
     f <- getFMort(params)
     p <- getPredMort(params)
     s <- getSealMort(params)

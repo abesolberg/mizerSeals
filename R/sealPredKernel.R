@@ -1,5 +1,5 @@
 # Compile Seal Predation Kernel
-sealPredKernel <- function(params , w , beta = 1000 , sigma = 1){
+setSealPredKernel <- function(params , w , beta = 1000 , sigma = 1){
 
   no_w_full <- length(w)
   ft_pred_kernel_e <- array(NA, dim = c(1, no_w_full), dimnames = list(sp = c('harp seals') , k = 1:no_w_full))
@@ -32,8 +32,11 @@ sealPredKernel <- function(params , w , beta = 1000 , sigma = 1){
   return(
     list(
       ft_pred_kernel_p = ft_pred_kernel_p ,
+      ft_pred_kernel_p_real = Re(ft_pred_kernel_p) ,
+      ft_pred_kernel_p_imag = Im(ft_pred_kernel_p) ,
       ft_pred_kernel_e = ft_pred_kernel_e ,
+      ft_pred_kernel_e_real = Re(ft_pred_kernel_e) ,
+      ft_pred_kernel_e_imag = Im(ft_pred_kernel_e) ,
       pred_kernel = pred_kernel[1,,,drop=T]
     ))
-
 }

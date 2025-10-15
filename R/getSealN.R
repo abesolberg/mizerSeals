@@ -1,6 +1,6 @@
 # Go through Seal N Vector -- Not Exported
 getSealN <- function (params, t , ...) {
-  arr <- params@other_params$sealParams$initialSealN
+  arr <- params@sealParams$initialSealN
   if(is.null(rownames(arr))) rownames(arr) <- 1:nrow(arr)
   if (!floor(t) %in% as.numeric(rownames(arr)))
     t <- t%%as.numeric(rownames(arr)[nrow(arr)]) +
@@ -13,7 +13,7 @@ getSealN <- function (params, t , ...) {
 }
 
 getSealH <- function (params, t , ...) {
-  arr <- params@other_params$sealParams$sealHarvest
+  arr <- params@sealParams$sealHarvest
   if(is.null(rownames(arr))) rownames(arr) <- 1:nrow(arr)
   if (!floor(t) %in% as.numeric(rownames(arr)))
     t <- t%%as.numeric(rownames(arr)[nrow(arr)]) +

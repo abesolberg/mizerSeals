@@ -1,7 +1,7 @@
 # outputs matrix of prey (amount) consumed by seals at size
 getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_pp , n_other = params@initial_n_other, idx_sp = 1:length(params@w) , t = NULL , ...) {
 
-  seal_params <- params@other_params$sealParams
+  sp <- params@sealParams
   n_seal <- n_other$seals
 
   #search_vol <- getSealSearchVol(params , n , n_pp)
@@ -9,10 +9,10 @@ getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_
   feedingLevel <- getSealFeedingLevel(params , encounter)
   pred_rate <- getSealPredRate(params , n , n_pp , n_other , t , feeding_level = feedingLevel , search_vol = sp$search_vol )
 
-  seal_interaction <- c(seal_params$interaction_seal , seal_params$resource_interaction_seal)
+  seal_interaction <- c(sp$interaction_seal , sp$resource_interaction_seal)
 
   no_sp <- nrow(params@species_params) + 1
-  no_w_full <- length(seal_params$w)
+  no_w_full <- length(sp$w)
 
   n_all <- matrix(NA , nrow = nrow(n)+1 , ncol = ncol(n))
   n_all[1:nrow(n),] <- n
@@ -20,9 +20,11 @@ getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_
 
   prey <- matrix(0, nrow = no_sp , ncol = no_w_full)
   prey[1:no_sp, idx_sp] <- sweep(n_all, 2, params@w * params@dw, "*")
+  
+  ft_pred_kernel_e <- sp$ft_pred_kernel_e_real+1i*sp$ft_pred_kernel_e_imag
 
   ft <- array(0 , dim = c(1,  no_w_full, no_sp))
-  for(i in 1:dim(ft)[3]) ft[,,i] <- seal_params$ft_pred_kernel_e*mvfft(t(prey))[,i]
+  for(i in 1:dim(ft)[3]) ft[,,i] <- ft_pred_kernel_e*mvfft(t(prey))[,i]
 
   ft <- matrix(aperm(ft , c(2, 1, 3)) , nrow = no_w_full)
 
@@ -43,9 +45,9 @@ getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_
   return(
     list(
       diet = diet ,
-      total_consumption = sum(sweep(diet , 2 , n_seal*seal_params$dw , "*")) ,
-      diet_by_sp = rowSums(sweep(diet , 2 , n_seal*seal_params$dw , "*")) ,
-      percent_by_sp = rowSums(sweep(diet , 2 , n_seal*seal_params$dw , "*"))/sum(sweep(diet , 2 , n_seal*seal_params$dw , "*"))
+      total_consumption = sum(sweep(diet , 2 , n_seal*sp$dw , "*")) ,
+      diet_by_sp = rowSums(sweep(diet , 2 , n_seal*sp$dw , "*")) ,
+      percent_by_sp = rowSums(sweep(diet , 2 , n_seal*sp$dw , "*"))/sum(sweep(diet , 2 , n_seal*sp$dw , "*"))
     )
   )
 }

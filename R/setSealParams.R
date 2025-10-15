@@ -10,10 +10,12 @@ setSealParams <- function(
     gamma = NULL , 
     time_steps = 1 ,
     initialSealN = NULL ,
+    sealHarvest = NULL ,
     dynamicSeals = F ,
     ...
 ) {
-
+  params <- `slot<-`(params , 'sealParams' , check = F , NULL)
+  
   dx <- log10(params@dw/params@w +1)[1]
   w <- c(params@w[-length(params@w)] , 10^(seq(from = log10(max(params@w)), to = log10(w_max_seal) , by = dx)))
   dw <- (10^dx - 1) * w
@@ -21,7 +23,7 @@ setSealParams <- function(
   if (is.null(initialSealN)) initialSealN <- array(0 , dim = c(time_steps , length(w)))
   if (!all.equal(dim(initialSealN), c(time_steps , length(w)))) stop('Seal Initial N does not have proper dimensions.')
   
-  pred <- sealPredKernel(params , w , beta , sigma)
+  pred <- setSealPredKernel(params , w , beta , sigma)
   
   if (is.null(gamma)) {
     gamma <- getSealGamma(
@@ -32,7 +34,8 @@ setSealParams <- function(
       f0 ,
       interaction_seal = interaction_seal ,
       resource_interaction_seal = resource_interaction_seal ,
-      ft_pred_kernel_e = pred$ft_pred_kernel_e ,
+      ft_pred_kernel_e_real = pred$ft_pred_kernel_e_real ,
+      ft_pred_kernel_e_imag = pred$ft_pred_kernel_e_imag ,
       dw = dw
     )
   }
@@ -48,6 +51,10 @@ setSealParams <- function(
     list(
       ft_pred_kernel_e = pred$ft_pred_kernel_e ,
       ft_pred_kernel_p = pred$ft_pred_kernel_p ,
+      ft_pred_kernel_e_real = pred$ft_pred_kernel_e_real ,
+      ft_pred_kernel_p_real = pred$ft_pred_kernel_p_real ,
+      ft_pred_kernel_e_imag = pred$ft_pred_kernel_e_imag ,
+      ft_pred_kernel_p_imag = pred$ft_pred_kernel_p_imag ,
       pred_kernel = pred$pred_kernel ,
       intake_max = h*w^n ,
       search_vol = search_vol , 
@@ -65,6 +72,7 @@ setSealParams <- function(
       h = h,
       gamma = gamma , 
       dynamicSeals = dynamicSeals ,
+      sealHarvest = sealHarvest ,
       ...
     )
   )

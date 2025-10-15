@@ -4,8 +4,8 @@
 # https://sizespectrum.org/mizer/reference/get_f0_default.html
 # https://sizespectrum.org/mizer/reference/setSearchVolume.html?q=sear#null
 
-getSealEncounter <- function(params , search_vol = params@other_params$sealParams$search_vol , n = params@initial_n, n_pp = params@initial_n_pp , ...) {
-  sp <- params@other_params$sealParams
+getSealEncounter <- function(params , search_vol = params@sealParams$search_vol , n = params@initial_n, n_pp = params@initial_n_pp , ...) {
+  sp <- params@sealParams
   if (is.null(sp)) {
     sp <- list(...)
   }
@@ -16,8 +16,10 @@ getSealEncounter <- function(params , search_vol = params@other_params$sealParam
   prey <- array(0 , dim = c(1 , length(sp$w)))
   prey[1:length(params@w)] <- c(sp$interaction_seal , sp$resource_interaction_seal) %*% n_all
   
+  ft_pred_kernel_e <- sp$ft_pred_kernel_e_real+1i*sp$ft_pred_kernel_e_imag
+  
   prey <- sweep(prey, 2, sp$w * sp$dw, "*")
-  avail_energy <- Re(base::t(mvfft(base::t(sp$ft_pred_kernel_e) * mvfft(base::t(prey)), inverse = TRUE)))/length(sp$w)
+  avail_energy <- Re(base::t(mvfft(base::t(ft_pred_kernel_e) * mvfft(base::t(prey)), inverse = TRUE)))/length(sp$w)
   avail_energy[avail_energy < 1e-18] <- 0
   encounter <- search_vol * avail_energy
   return(encounter)
@@ -37,7 +39,7 @@ getSealGamma <- function(params , w , q , h , f0 , ...) {
   return(gamma)
 }
 
-getSealSearchVol <- function(params , w = params@other_params$sealParams$w , q = params@other_params$sealParams$q , gamma = params@other_params$sealParams$gamma) {
+getSealSearchVol <- function(params , w = params@sealParams$w , q = params@sealParams$q , gamma = params@sealParams$gamma) {
   search_vol <- (w^q)*gamma
   return(search_vol)
 }

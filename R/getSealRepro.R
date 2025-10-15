@@ -3,7 +3,7 @@ getSealRepro <- function(params, n = params@initial_n,
                         n_pp = params@initial_n_pp ,
                         n_other = params@initial_n_other,
                         t , dt , ...) {
-  sp <- params@other_params$sealParams
+  sp <- params@sealParams
   if(is.null(sp)) stop('Must add seal parameters to other params.')
   if(!sp$dynamicSeals) return(getSealN(params , t = t))
 
