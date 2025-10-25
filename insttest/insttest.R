@@ -9,7 +9,51 @@ library(ggplot2)
 
 # sapply(list.files('R/', , full.names=T) , source)
 
+## To Do:
+
+# Create function to make all params
+  # Function to sort effort and annual rates
+  # Function should basically set everything as a paramater and then map out whatever isn't needed
+    # Map when catch = 0, sex = M, ...
+  # Need to create helper function to put everything back into the param object. 
+  # Params:
+    # Rmax, MuB multiplier, Recruitment anomaly
+    # Interaction matrix, resource interaction (so you can potentially fit to diet)
+    # Catchability, Effort
+    # Seal Diet interaction & resource interaction
+    # Seal bioenergetic rates
+
+getNewVals <- function(params , newvals = list()) {
+  for(i in names(newvals)) {
+    val <- slot(params , i)
+    if (is.list(newvals[[i]])) {
+      .newvals <- newvals[[i]]
+      for (k in names(.newvals)) {
+        val[[k]][] <- .newvals[[k]]
+      }
+    } else val[] <- newvals[[i]]
+    slot(params , i) <- val
+  }
+  return(params)
+  #sp_vals <- names(params@species_params)
+  #other_vals <- names(params@other_params)
+  #seal_params <- names(params@seal_params)
+  #trawl_params <- names(trawl_params)
+}
+
 params <- mizer::NS_params
+params@species_params$q
+
+newvals <- list(
+  species_params = list(p = 1 , q = runif(12 , 0 , 1)) ,
+  catchability = runif(12*4 , 0 , 1)
+)
+
+test <- getNewVals(params , newvals)
+test@species_params$p
+test@species_params$q
+test@catchability
+
 
 sealParams <- setSealParams(
   params , w_max_seal = 150000 , w_min_seal = 11000 ,
@@ -40,14 +84,15 @@ fun <- function(params, n = params@initial_n, n_pp = params@initial_n_pp,
   #params@species_params$R_max <- R_max # New Parameter
   #params@mu_b <- params@mu_b * mu_b # New Scaling Factor
   
+  #params <- getNewVals(params , newvals = list())
+  
   no_sp <- nrow(params@species_params)
   no_w <- length(params@w)
   idx <- 2:no_w
-  years <- steps*dt
+  years <- steps*dt # steps should be calculated by length of effort
   
   f_at_dt <- n_at_dt <- array(0 , dim = c(no_sp , no_w , steps))
-  
-  test <- c()
+  seals_dt <- n_other$seals
   
   w_min_idx_array_ref <- (params@w_min_idx - 1) * no_sp + (1:no_sp)
   a <- matrix(0, nrow = no_sp, ncol = no_w)
@@ -61,10 +106,8 @@ fun <- function(params, n = params@initial_n, n_pp = params@initial_n_pp,
     for (component in names(params@other_dynamics)) {
       n_other_new[[component]] <- other_dynamics_fns[[component]](params, 
                                                                   n = n, n_pp = n_pp, n_other = n_other, rates = r, 
-                                                                  t = t, dt = dt, component = component , ...)*sample(0:1 , 1)
+                                                                  t = t, dt = dt, component = component , ...)
     }
-    
-    test <- c(test , max(n_other_new$seals))
     
     n_pp <- resource_dynamics_fn(params, n = n, n_pp = n_pp, 
                                  n_other = n_other, rates = r, t = t, dt = dt, resource_rate = params@rr_pp, 
@@ -78,19 +121,40 @@ fun <- function(params, n = params@initial_n, n_pp = params@initial_n_pp,
                                  dt/params@dw[params@w_min_idx])/b[w_min_idx_array_ref]
     n <- mizer:::inner_project_loop(no_sp = no_sp, no_w = no_w, n = n, 
                             A = a, B = b, S = S, w_min_idx = params@w_min_idx)
+    n_other <- n_other_new
     t <- t + dt
     
     n_at_dt[,,i_time] <- n # Can figure out how to do this otherwise
     f_at_dt[,,i_time] <- n*sim$rates$f_mort*dt # Can figure out how to do this otherwise
+    seals_dt <- c(seals_dt , n_other$seals)
   }
   n_at_y <- n_at_dt[,,seq(1 , i_time , by = years)]
   y <- rep(seq_along(1:years), each = years*dt)
-  f_at_y <- sapply(1:years , function(x) (apply(f_at_dt[,,which(y == x)] , 1 , sum))) # This puts out the wrong format
- 
+  f_at_y <- sapply(1:years , function(x) (apply(f_at_dt[,,which(y == x)] , 1 , sum))) # This puts out the wrong format, also not aggregated
+  # Trawl at T
+  
+  # Seal Consumption Reports (maybe needed, but can just do it after...)
+  
+  ## Fitting Functions
+  # Fit to catch
+  
+  # Fit to trawl
+  
+  # Fit RE F (normal or lognormal, allow for switch)
+  
+  # Fit RE Recruitment (Normal or lognormal distribution)
+  
+  # Fit RE Mu_b (Normal distribution, random walk)
+  
+  # Fit to seal biomass
+  
+  # Fit Seal RE (Normal or Lognormal distribution)
+  
+  
   return(list(
     n = n_at_y, 
     f = f_at_y ,
-    n_other = test 
+    n_other = seals_dt 
   ))
    
 }
