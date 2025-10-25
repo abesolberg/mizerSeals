@@ -1,5 +1,5 @@
 #ifndef EIGEN_FFTW_DEFAULT
-#define EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT 
 #endif
 
 #include <TMB.hpp>
