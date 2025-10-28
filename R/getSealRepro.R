@@ -9,10 +9,9 @@ getSealRepro <- function(params, n = params@initial_n,
 
   # Set Prey & Bm0
   prey <- getSealDiet(params , n = n , n_seal = n_other$seals)$total_consumption
-  Bm0 <- sum(n_other$seals)
   H <- getSealH(params , t)*dt # Change harvest level to fit with time step
-
-  list <- append(c(prey = prey , Bm0 = Bm0 , H = H) , sp)
+  alpha <- getCoeff(params , par = 'alpha' , where = 'sealParams' , t) # Random Effect for Seals
+  list <- append(list(N = n_other$seals , prey = prey , H = H , .alpha = alpha) , sp)
   ret <- do.call(setBioMod , list)
   return(ret)
 }

@@ -62,6 +62,22 @@ sealParams <- setSealParams(
   time_step = 5 , dynamicSeals = F , h = 250
 )
 sealParams$initialSealN[,107] <- rnorm(5 , 20000000 , 25000)/sealParams$dw[107]
+
+
+setBioMod <- function(Bm0 , Msrr , Jmax , e , resource , M , H , prey , alpha , ...) {
+  tot <- sum(c(prey,resource), na.rm = T)
+  num <- tot^2 ; den <- Jmax+tot^2
+  ret <- (Bm0 + Bm0*(-Msrr+e*Jmax*(num/den)) - M*(Bm0)^2 - H) + alpha
+  return(ret)
+}
+
+Msrr = 54.9*(sealParams$w[107])^-0.25
+Jmax = 89.4*(sealParams$w[107])^-0.25
+e = 0.89
+M = .000001
+
+setBioMod(sealParams$initialSealN , Msrr , Jmax , e , 0 , M , 0 , 2e6 , 0)
+
 #sealParams$initialSealN[,107] <- 1:100
 params <- setSeals(mizer::NS_params , sealParams)
 sim <- project_simple(params , dt = .1 , steps = 1)

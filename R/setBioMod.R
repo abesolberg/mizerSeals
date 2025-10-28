@@ -1,9 +1,12 @@
 ## BioEnergetic Model for Seals
 
-setBioMod <- function(Bm0 , Msrr , Jmax , e , resource , M , H , prey , alpha , ...) {
+setBioMod <- function(N , Msrr , Jmax , e , resource , M , H , prey , .alpha , w , dw , idx ,...) {
+  Bm0 <- N*w*dw
   tot <- sum(c(prey,resource), na.rm = T)
   num <- tot^2 ; den <- Jmax+tot^2
-  ret <- (Bm0 + Bm0*(-Msrr+e*Jmax*(num/den)) - M*(Bm0)^2 - H) + alpha
+  ret <- (Bm0 + Bm0*(-Msrr+e*Jmax*(num/den)) - M*(Bm0)^2 - H[1,]) + .alpha[1,]
+  ret <- ret/(w*dw)
+  ret[-idx] <- 0
   return(ret)
 }
 

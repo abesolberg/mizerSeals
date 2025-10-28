@@ -4,5 +4,9 @@ exportPattern('set')
 exportPattern('get')
 exportPattern('plot')
 
+exportMethods('validParams')
+
 import('mizer') # Import all mizer functions
+import('RTMB') # Import all RTMB
+import('stats' , 'nlminb')
 importFrom('stats' , 'setNames')

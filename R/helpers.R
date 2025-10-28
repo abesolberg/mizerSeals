@@ -30,3 +30,32 @@ list2array <- function(list){
   return(out)
 }
 
+getNewVals <- function(params , newvals = list()) {
+  for(i in names(newvals)) {
+    val <- slot(params , i)
+    if (is.list(newvals[[i]])) {
+      .newvals <- newvals[[i]]
+      for (k in names(.newvals)) {
+        val[[k]][] <- .newvals[[k]]
+      }
+    } else val[] <- newvals[[i]]
+    slot(params , i , check = F) <- val
+  }
+  return(params)
+}
+
+get_val_at_t <- function(val , t, ...) {
+  if (is.vector(val)) {
+    arr <- matrix(val , ncol = 1)
+  } else arr <- val
+  if (is.null(rownames(arr))) 
+    rownames(arr) <- 1:nrow(arr)
+  if (!floor(t) %in% as.numeric(rownames(arr))) 
+    t <- t%%as.numeric(rownames(arr)[nrow(arr)]) + as.numeric(rownames(arr)[1])
+  index_vec <- as.numeric(rownames(arr)) - t
+  index <- which(index_vec == max(index_vec[index_vec <= 0]))
+  var_at_t <- arr[index, , drop = F]
+  return(var_at_t[1,])
+}
+
+

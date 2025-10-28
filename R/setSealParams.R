@@ -12,6 +12,13 @@ setSealParams <- function(
     initialSealN = NULL ,
     sealHarvest = NULL ,
     dynamicSeals = F ,
+    alpha = NULL ,
+    Msrr = NULL, 
+    Jmax = NULL,
+    e = NULL,
+    M = NULL,
+    resource = 0 , # Fixed amount of seal predation outside of model area
+    idx = NULL ,
     ...
 ) {
   params <- `slot<-`(params , 'sealParams' , check = F , NULL)
@@ -46,9 +53,13 @@ setSealParams <- function(
     q = q ,
     gamma = gamma 
   )
- 
+  
+  if(is.null(idx))  idx <- max(which(w <= w_min_seal)):length(w)
+  
   return(
     list(
+      w_max_seal = w_max_seal , 
+      w_min_seal = w_min_seal ,
       ft_pred_kernel_e = pred$ft_pred_kernel_e ,
       ft_pred_kernel_p = pred$ft_pred_kernel_p ,
       ft_pred_kernel_e_real = pred$ft_pred_kernel_e_real ,
@@ -73,6 +84,13 @@ setSealParams <- function(
       gamma = gamma , 
       dynamicSeals = dynamicSeals ,
       sealHarvest = sealHarvest ,
+      alpha = alpha ,
+      Msrr = Msrr, 
+      Jmax = Jmax,
+      e = e,
+      M = M,
+      resource = resource ,
+      idx = idx , 
       ...
     )
   )

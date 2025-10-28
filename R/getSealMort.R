@@ -31,10 +31,11 @@ getSealResourceMort <- function(params, n = params@initial_n,
   f <- function (params, n, n_pp, n_other, t, pred_rate, ...) {
     as.vector(params@species_params$interaction_resource %*% pred_rate)
   }
-  mort <- f(params, n = n, n_pp = n_pp, n_other = n_other, t = t, pred_rate = mizer::getPredRate(params, n = n, n_pp = n_pp, n_other = n_other, t = t))
+  mort <- f(params, n = n, n_pp = n_pp, n_other = n_other, t = t, pred_rate = getPredRate(params, n = n, n_pp = n_pp, n_other = n_other, t = t))
   names(mort) <- names(params@initial_n_pp)
   idx <- tail(1:length(mort) , length(params@w))
   mort[idx] <- mort[idx] + c(mu_seal)
   return(mort)
 }
+
 

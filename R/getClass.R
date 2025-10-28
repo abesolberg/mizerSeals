@@ -18,3 +18,5 @@ S4toList <- function(obj) {
   structure(lapply(sn, slot, object = obj), names = sn)
 }
 
+setGeneric("validParams")
+setMethod("validParams" , "MizerSealParams" , definition = function(params) return(params))
