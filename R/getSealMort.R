@@ -4,8 +4,8 @@ getSealMort <- function(params, n = params@initial_n,
                         n_pp = params@initial_n_pp,
                         n_other = params@initial_n_other,
                         t , ...) {
-  if(is.null(params@sealParams)) stop('Must add seal parameters to other params.')
-  sp <- params@sealParams
+  if(is.null(params@seal_params)) stop('Must add seal parameters to other params.')
+  sp <- params@seal_params
 
   encounter <- getSealEncounter(params , search_vol = sp$search_vol)
   feedingLevel <- getSealFeedingLevel(params , encounter)
@@ -19,8 +19,8 @@ getSealResourceMort <- function(params, n = params@initial_n,
                                 n_pp = params@initial_n_pp,
                                 n_other = params@initial_n_other,
                                 t ,...) {
-  if(is.null(params@sealParams)) stop('Must add seal parameters to other params.')
-  sp <- params@sealParams
+  if(is.null(params@seal_params)) stop('Must add seal parameters to other params.')
+  sp <- params@seal_params
 
   encounter <- getSealEncounter(params , search_vol = sp$search_vol)
   feedingLevel <- getSealFeedingLevel(params , encounter)

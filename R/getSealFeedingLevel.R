@@ -2,7 +2,7 @@
 # https://sizespectrum.org/mizer/reference/setMaxIntakeRate.html?q=intake#null
 
 getSealFeedingLevel <- function(params , encounter) {
-  sp <- params@sealParams
+  sp <- params@seal_params
   intake_max <- sp$h*sp$w^sp$n
   return(encounter/(encounter + intake_max))
 }

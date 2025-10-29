@@ -21,8 +21,8 @@ setBioMod <- function(N , Msrr , Jmax , e , resource , M , H , prey , .alpha , w
 #At = 54.9 for endotherms
 #Aj = 89.4 for Endotherms
 
-# Mssr = 54.9*(params@other_params$sealParams$w[idx])^-0.25
-# Jmax = 89.4*(params@other_params$sealParams$w[idx])^-0.25
+# Mssr = 54.9*(params@other_params$seal_params$w[idx])^-0.25
+# Jmax = 89.4*(params@other_params$seal_params$w[idx])^-0.25
 # e = 0.89
 # M = .2
 # a = Not needed in this model
@@ -36,8 +36,8 @@ setBioMod <- function(N , Msrr , Jmax , e , resource , M , H , prey , .alpha , w
 # M = mortality coefficent
 # Resource = 0 (given, could be estimated but we now have resource predation)
 
-# Msrr = 54.9*(params@other_params$sealParams$w[idx])^-0.25
-# Jmax = 89.4*(params@other_params$sealParams$w[idx])^-0.25
+# Msrr = 54.9*(params@other_params$seal_params$w[idx])^-0.25
+# Jmax = 89.4*(params@other_params$seal_params$w[idx])^-0.25
 # e = 0.89
 # M = .000001
 # 

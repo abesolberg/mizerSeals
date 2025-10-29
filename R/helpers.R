@@ -1,6 +1,6 @@
 # Plot Pred Kernel
 plotSealPredKernel <- function(params , idx = NULL) {
-  sp <- params@sealParams
+  sp <- params@seal_params
   if(is.null(idx)) idx <- length(sp$w)
   plot(sp$pred_kernel[idx,])
 }

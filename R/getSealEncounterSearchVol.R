@@ -4,8 +4,8 @@
 # https://sizespectrum.org/mizer/reference/get_f0_default.html
 # https://sizespectrum.org/mizer/reference/setSearchVolume.html?q=sear#null
 
-getSealEncounter <- function(params , search_vol = params@sealParams$search_vol , n = params@initial_n, n_pp = params@initial_n_pp , ...) {
-  sp <- params@sealParams
+getSealEncounter <- function(params , search_vol = params@seal_params$search_vol , n = params@initial_n, n_pp = params@initial_n_pp , ...) {
+  sp <- params@seal_params
   if (is.null(sp)) {
     sp <- list(...)
   }
@@ -39,7 +39,7 @@ getSealGamma <- function(params , w , q , h , f0 , ...) {
   return(gamma)
 }
 
-getSealSearchVol <- function(params , w = params@sealParams$w , q = params@sealParams$q , gamma = params@sealParams$gamma) {
+getSealSearchVol <- function(params , w = params@seal_params$w , q = params@seal_params$q , gamma = params@seal_params$gamma) {
   search_vol <- (w^q)*gamma
   return(search_vol)
 }

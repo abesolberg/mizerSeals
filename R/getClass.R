@@ -1,11 +1,11 @@
-## MizeRTMB Predation 
+## MizeRTMB Predation
 
 setClass(
   'MizerSealParams' ,
   slots = c(
     getSlots('MizerParams') ,
-    sealParams = "list" ,
-    trawlParams = "list" ,
+    seal_params = "list" ,
+    trawl_params = "list" ,
     ft_pred_kernel_e_real = 'array',
     ft_pred_kernel_e_imag = 'array',
     ft_pred_kernel_p_real = 'array' ,

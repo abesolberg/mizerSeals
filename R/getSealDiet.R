@@ -1,7 +1,7 @@
 # outputs matrix of prey (amount) consumed by seals at size
 getSealDiet <- function(params , n = params@initial_n , n_pp = params@initial_n_pp , n_other = params@initial_n_other, idx_sp = 1:length(params@w) , t = NULL , ...) {
 
-  sp <- params@sealParams
+  sp <- params@seal_params
   n_seal <- n_other$seals
 
   #search_vol <- getSealSearchVol(params , n , n_pp)

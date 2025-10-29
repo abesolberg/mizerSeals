@@ -1,3 +1,5 @@
+# List of Rates
+
 RTMBRates <- list(
   Rates = "mizerRatesRTMB" ,
   Encounter = "getEncounterRTMB",
@@ -9,7 +11,7 @@ RTMBRates <- list(
   PredMort = "getPredMortRTMB",
   FMort = "getFMortRTMB",
   SealEncounter = "getSealEncounterRTMB",
-  SealFeedingLevel = "getSealFeedingLevelRTMB", 
+  SealFeedingLevel = "getSealFeedingLevelRTMB",
   SealPredRate = "getSealPredRateRTMB",
   SealMort = "getSealMortRTMB",
   Mort = "getMortRTMB",
@@ -18,12 +20,14 @@ RTMBRates <- list(
   SealResourceMortRate = "getSealResourceMortRateRTMB",
   ResourceMortRate = "getResourceMortRateRTMB",
   ResourceMort = "getResourceMortRTMB",
-  SealDiet = "getSealDietRTMB", 
+  SealDiet = "getSealDietRTMB",
   SealRepro = "getSealReproRTMB",
   ResourceDynamics = "getResourceDynamicsRTMB" ,
   TrawlCatch = "getTrawlCatchRTMB" ,
   Yield = "getYieldRTMB"
 )
+
+# Mizer Rates Function
 
 mizerRatesRTMB <- function(n , n_pp , n_other , dt , effort , effort_trawl , rdd , z , alpha_seal , H , dat) {
   list2env(dat , environment())
@@ -63,17 +67,6 @@ rates_vars <- c(
   "selectivity","selectivity_trawl","w","w_full","w_min_idx","w_seal"
 )
 
-# PARAMS: w , w_full , dw_full , ft_pred_kernel_e_real , ft_pred_kernel_e_imag , interaction , 
-#         intake_max , metab , psi , ft_pred_kernel_e_real , ft_pred_kernel_e_imag , ft_mask ,
-#         search_vol , catchability , selectivity
-# SPECIES_PARAMS interaction_resource , alpha , erepro
-
-# OTHER: effort, z , rdd , alpha (Random Effects)
-
-# Seal Params: search_vol_seal , w_seal , dw_seal , interaction_seal , 
-#     resource_interaction_seal , ft_pred_kernel_e_real_seal , ft_pred_kernel_e_imag_seal 
-#     w , n , h , idx_seal , H , M , Msrr , Jmax , e , resource
-
 f <- function() {
   args <- mget(ls(envir = parent.frame()) , envir = parent.frame())
   if(any(sapply(args , is.null))) {
@@ -84,8 +77,8 @@ f <- function() {
 }
 
 # Encounter
-getEncounterRTMB <- function(n , n_pp , n_other , w = NULL , w_full = NULL , dw_full = NULL , 
-                             ft_pred_kernel_e_real = NULL , ft_pred_kernel_e_imag = NULL , 
+getEncounterRTMB <- function(n , n_pp , n_other , w = NULL , w_full = NULL , dw_full = NULL ,
+                             ft_pred_kernel_e_real = NULL , ft_pred_kernel_e_imag = NULL ,
                              interaction = NULL , interaction_resource = NULL ,  search_vol = NULL) {
   f()
   idx_sp <- (length(w_full) - length(w) + 1):length(w_full)
@@ -121,7 +114,7 @@ getFeedinLevelRTMB <- function(encounter, intake_max = NULL) {
 # EreproAndGrowth
 getEReproAndGrowthRTMB <- function(encounter , feeding_level , metab = NULL , alpha = NULL) {
   f()
-  sweep((1 - feeding_level) * encounter, 1, alpha, 
+  sweep((1 - feeding_level) * encounter, 1, alpha,
         "*", check.margin = FALSE) - metab
 }
 
@@ -141,22 +134,22 @@ getEGrowthRTMB <- function(e , e_repro) {
 
 ## Predation ----
 
-getPredRateRTMB <- function (n , n_pp , n_other ,feeding_level , 
-                             w = NULL, w_full = NULL , dw = NULL, interaction = NULL, 
-                             ft_pred_kernel_p_real = NULL , ft_pred_kernel_p_imag = NULL,  
+getPredRateRTMB <- function (n , n_pp , n_other ,feeding_level ,
+                             w = NULL, w_full = NULL , dw = NULL, interaction = NULL,
+                             ft_pred_kernel_p_real = NULL , ft_pred_kernel_p_imag = NULL,
                              search_vol = NULL , ft_mask = NULL) {
   f()
   no_sp <- dim(interaction)[1]
   no_w <- length(w)
   no_w_full <- length(w_full)
-  
-  # ft_pred_kernel_p <- as.complex(ft_pred_kernel_p_real) + (0+1i) * 
+
+  # ft_pred_kernel_p <- as.complex(ft_pred_kernel_p_real) + (0+1i) *
   #   as.complex(ft_pred_kernel_p_imag)
   idx_sp <- (no_w_full - no_w + 1):no_w_full
   Q <- matrix(0, nrow = no_sp, ncol = no_w_full)
-  Q[, idx_sp] <- sweep((1 - feeding_level) * search_vol * 
+  Q[, idx_sp] <- sweep((1 - feeding_level) * search_vol *
                          n, 2, dw, "*")
-  
+
   m <- AD(matrix(0 , nrow = nrow(n) , ncol = length(w_full)))
   for(i in 1:nrow(n)) {
     pred_rate <- Re((RTMB::fft((
@@ -168,8 +161,8 @@ getPredRateRTMB <- function (n , n_pp , n_other ,feeding_level ,
     m[i, ] <- pred_rate
   }
   pred_rate <- as.matrix(m)
-  
-  # pred_rate <- Re(base::t(mvfft(base::t(ft_pred_kernel_p) * 
+
+  # pred_rate <- Re(base::t(mvfft(base::t(ft_pred_kernel_p) *
   #                                 mvfft(base::t(Q)), inverse = TRUE)))/no_w_full
   # pred_rate[pred_rate < 1e-18] <- 0
   return(pred_rate * ft_mask)
@@ -208,9 +201,9 @@ getYieldRTMB <- function(f_mort , n , w = NULL , dw = NULL , dt = NULL) {
 
 ## Seal Predation Rates ----
 
-getSealEncounterRTMB <- function(n , n_pp , search_vol_seal = NULL , 
-                                 w_full = NULL , w = NULL, w_seal = NULL , dw_seal = NULL, 
-                                 interaction_seal = NULL , resource_interaction_seal = NULL , 
+getSealEncounterRTMB <- function(n , n_pp , search_vol_seal = NULL ,
+                                 w_full = NULL , w = NULL, w_seal = NULL , dw_seal = NULL,
+                                 interaction_seal = NULL , resource_interaction_seal = NULL ,
                                  ft_pred_kernel_e_real_seal = NULL , ft_pred_kernel_e_imag_seal = NULL) {
   f()
   n_all <- matrix(0, nrow = nrow(n) + 1, ncol = ncol(n))
@@ -237,17 +230,17 @@ getSealFeedingLevelRTMB <- function(encounter , w_seal = NULL , h_seal = NULL, n
   return(encounter/(encounter + intake_max))
 }
 
-getSealPredRateRTMB <- function(n , n_pp , n_other , feeding_level , 
-                                w = NULL , w_seal = NULL, dw_seal = NULL, 
-                                ft_pred_kernel_p_real_seal = NULL , ft_pred_kernel_p_imag_seal = NULL, 
+getSealPredRateRTMB <- function(n , n_pp , n_other , feeding_level ,
+                                w = NULL , w_seal = NULL, dw_seal = NULL,
+                                ft_pred_kernel_p_real_seal = NULL , ft_pred_kernel_p_imag_seal = NULL,
                                 search_vol_seal = NULL) {
   f()
   #ft_pred_kernel_p <- as.complex(ft_pred_kernel_p_real_seal) + (0+1i) * as.complex(ft_pred_kernel_p_imag_seal)
   no_w <- length(w)
   no_w_full <- length(w_seal)
-  Q <- ((1 - feeding_level) * search_vol_seal * c(n_other)) * 
+  Q <- ((1 - feeding_level) * search_vol_seal * c(n_other)) *
     dw_seal
-  pred_rate <- Re(base::t(RTMB::fft((as.complex(ft_pred_kernel_p_real_seal) + (0+1i) * as.complex(ft_pred_kernel_p_imag_seal)) * 
+  pred_rate <- Re(base::t(RTMB::fft((as.complex(ft_pred_kernel_p_real_seal) + (0+1i) * as.complex(ft_pred_kernel_p_imag_seal)) *
                                       RTMB::fft((Q)), inverse = TRUE)))/no_w_full
   #pred_rate[pred_rate < 1e-18] <- 0
   return(pred_rate)
@@ -301,7 +294,7 @@ getResourceMortRTMB <- function(resource_mort_rate , resource_mort_rate_seals , 
 
 ## Seal Reproduction ----
 
-getSealDietRTMB <- function(n , n_pp , n_other , feeding_level , 
+getSealDietRTMB <- function(n , n_pp , n_other , feeding_level ,
                             interaction_seal = NULL , resource_interaction_seal = NULL , w_full = NULL ,
                             w = NULL , dw = NULL , w_seal = NULL , dw_seal = NULL, search_vol_seal  = NULL,
                             ft_pred_kernel_e_real_seal = NULL, ft_pred_kernel_e_imag_seal = NULL , idx_seal = NULL ,
@@ -315,21 +308,21 @@ getSealDietRTMB <- function(n , n_pp , n_other , feeding_level ,
   n_all[1:nrow(n), ] <- n
   n_all[nrow(n_all), ] <- n_pp[w_full %in% w]
   prey <- matrix(0, nrow = no_sp, ncol = no_w_full)
-  prey[1:no_sp, idx_sp] <- sweep(n_all, 2, w * dw, 
+  prey[1:no_sp, idx_sp] <- sweep(n_all, 2, w * dw,
                                  "*")
   ft_pred_kernel_e <- as.complex(ft_pred_kernel_e_real_seal) + (0+1i) * as.complex(ft_pred_kernel_e_imag_seal)
   ft <- array(0, dim = c(1, no_w_full, no_sp))
   diet <- matrix(0 , no_sp , no_w_full)
   for(i in 1:no_sp) {
-    ae <- Re(RTMB::fft((as.complex(ft_pred_kernel_e_real_seal) + (0+1i) * as.complex(ft_pred_kernel_e_imag_seal)) * 
+    ae <- Re(RTMB::fft((as.complex(ft_pred_kernel_e_real_seal) + (0+1i) * as.complex(ft_pred_kernel_e_imag_seal)) *
                          RTMB::fft(t(prey)[,i]) , inverse = T)/no_w_full)
     diet[i,] <- ae
   }
-  
+
   for (i in 1:nrow(diet)) {
     diet[i, ] = diet[i, ] * search_vol_seal * seal_interaction[i]
   }
-  diet <- diet * matrix(data = (1 - feeding_level), nrow = no_sp, 
+  diet <- diet * matrix(data = (1 - feeding_level), nrow = no_sp,
                         ncol = no_w_full, byrow = T)
   diet[,-idx_seal] <- 0
   out <- list(
@@ -343,17 +336,17 @@ getSealDietRTMB <- function(n , n_pp , n_other , feeding_level ,
 }
 
 
-getSealReproRTMB <- function(n_other , prey , alpha_seal , w_seal = NULL , dw_seal = NULL , 
-                             Msrr_seal = NULL , Jmax_seal = NULL , e_seal = NULL , resource_seal = NULL , 
+getSealReproRTMB <- function(n_other , prey , alpha_seal , w_seal = NULL , dw_seal = NULL ,
+                             Msrr_seal = NULL , Jmax_seal = NULL , e_seal = NULL , resource_seal = NULL ,
                              M_seal = NULL , H = NULL , idx_seal = NULL) {
   f()
   N <- n_other
   Bm0 <- N*w_seal*dw_seal
   tot <- sum(c(prey,resource_seal), na.rm = T)
   num <- tot^2 ; den <- Jmax_seal+tot^2
-  
+
   ret <- (Bm0 + Bm0*(-Msrr_seal+e_seal*Jmax_seal*(num/den)) - M_seal*(Bm0)^2 - H) + alpha_seal
-  ret <- ret/(w_seal*dw_seal)  
+  ret <- ret/(w_seal*dw_seal)
   ret[-idx_seal] <- 0
   return(ret)
 }

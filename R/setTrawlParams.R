@@ -7,6 +7,6 @@ setTrawlParams <- function(params , gear_params , effort) {
     catchability = tmp@catchability ,
     effort = effort[,dimnames(tmp@selectivity)$gear]
   )
-  params <- `slot<-`(params , 'trawlParams' , check = F , gp)
+  params <- `slot<-`(params , 'trawl_params' , check = F , gp)
   return(params)
 }

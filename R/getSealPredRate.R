@@ -6,7 +6,7 @@ getSealPredRate <- function(params ,
                             n_other = params@initial_n_other,
                             t , feeding_level , search_vol , ... ) {
 
-  sp <- params@sealParams
+  sp <- params@seal_params
 
   ft_pred_kernel_p <- sp$ft_pred_kernel_p_real+1i*sp$ft_pred_kernel_p_imag
   
@@ -20,13 +20,13 @@ getSealPredRate <- function(params ,
 }
 
 getSealMortRate <- function(params , pred_rate , ... ) {
-  sp <- params@sealParams
+  sp <- params@seal_params
   pred_mort <- sp$interaction_seal %*% pred_rate[, 1:length(params@w), drop = FALSE]
   return(pred_mort)
 }
 
 getSealResourceMortRate <- function(params , pred_rate , ... ) {
-  sp <- params@sealParams
+  sp <- params@seal_params
   pred_mort <- sp$resource_interaction_seal %*% pred_rate[,1:length(params@w), drop = FALSE]
   return(pred_mort)
 }

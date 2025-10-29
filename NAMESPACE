@@ -3,10 +3,13 @@ exportClasses("MizerSealParams")
 exportPattern('set')
 exportPattern('get')
 exportPattern('plot')
+exportPattern('RTMB')
+export('s4toList')
+export('rates_vars')
 
 exportMethods('validParams')
 
 import('mizer') # Import all mizer functions
 import('RTMB') # Import all RTMB
-import('stats' , 'nlminb')
+importFrom('stats' , 'nlminb')
 importFrom('stats' , 'setNames')
