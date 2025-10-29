@@ -4,7 +4,6 @@
 library(mizer)
 library(mizerSeals)
 library(RTMB)
-compiler::enableJIT(0);
 
 ## Hack Valid Params ----
 
@@ -14,6 +13,8 @@ compiler::enableJIT(0);
 
 # path <- 'data/inputs/'
 path <- 'insttest/data/'
+
+# https://github.com/bbolker/rtmb_tips/blob/main/README.md
 
 init_params <- readRDS(paste0(path , 'initial_steady_params.RDS')) # Steady State Params
 catch <- readRDS(paste0(path , 'commercial_catch_matrix.RDS')) # Catch
@@ -48,10 +49,7 @@ params <- setSeals(init_params , sealParams)
 params <- setTrawlParams(params , trawl_params , trawl_effort)
 
 ## Test sim
-sim <- project(params , t_max = 35)
-
-## Write Calibration Functions
-
+# sim <- project(params , t_max = 35)
 
 ## Fit Steady State ----
 
@@ -92,13 +90,13 @@ params@other_params$rdd <- matrix(getTVRDD(getRDI(params) , species_params = par
 params <- setRateFunction(params, "Mort" , "getTVMort")
 params <- setRateFunction(params, "RDD" , "getTVRDD2")
 
-# source('R/RTMBFunsDef.R')
-# source('R/RTMBFuns.R')
-# source('R/dat_to_include.R')
 
-rates_fns <- lapply(RTMBRates , get)
+# Unfortunately, RTMB won't work with functions called from a library (or at least these functions)
+# Just put all the functions into your global env.
+list2env(mget(ls(getNamespace('mizerSeals')) , getNamespace('mizerSeals')) , .GlobalEnv)
+rates_fns <- lapply(RTMBRates , get , .GlobalEnv)
 
-dat <- mizerSeals:::S4toList(params)
+dat <- S4toList(params)
 dat <- dat[sapply(dat , is.numeric)]
 dat$ft_mask <- params@ft_mask
 
@@ -195,7 +193,7 @@ fun <- function(...) {
   s_at_y <- s_at_dt[seq(1 , i_time , by = years) , ]
   y <- rep(seq_along(1:years), each = years)
   y_at_y <- t(sapply(1:years , function(x) (apply(y_at_dt[which(y == x),] , 2 , sum))))
-  t_at_y <- out$t_at_dt[,,seq(1 , i_time , by = years)]
+  t_at_y <- t_at_dt[,,seq(1 , i_time , by = years)]
   biomass <- apply(sweep(n_at_y, 2, w*dw, "*"), c(3, 1), sum)
 
   # Fit Model
@@ -300,9 +298,11 @@ pars <- list(
 
 log_pars <- lapply(pars , log)
 data <- data[!names(data) %in% names(log_pars)]
+
+# Put Data Into Environment
 environment(fun) <- list2env(data)
 
-# out <- do.call(fun , log_pars)
+#out <- do.call(fun , log_pars)
 
 map <- with(
   log_pars ,
@@ -322,7 +322,6 @@ map <- with(
     rdd = species_params(params)$main_spec
   )
 )
-
 
 for(i in 1:length(map)) map[[i]] <- factor(map[[i]])
 

@@ -4,7 +4,7 @@ exportPattern('set')
 exportPattern('get')
 exportPattern('plot')
 exportPattern('RTMB')
-export('s4toList')
+export('S4toList')
 export('rates_vars')
 
 exportMethods('validParams')
